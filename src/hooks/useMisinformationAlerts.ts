@@ -46,22 +46,31 @@ export const useMisinformationAlerts = () => {
         return;
       }
 
-      // Then get alerts for those assets with IP asset info
+      // Get alerts for those assets
       const { data: alertsData, error: alertsError } = await supabase
         .from('misinformation_alerts')
-        .select(`
-          *,
-          ip_assets(title)
-        `)
+        .select('*')
         .in('ip_asset_id', assetIds)
         .order('created_at', { ascending: false });
 
       if (alertsError) throw alertsError;
-      
-      const formattedAlerts = alertsData?.map(alert => ({
-        ...alert,
-        ip_asset_title: alert.ip_assets?.title || 'Unknown Asset'
-      })) || [];
+
+      // Get IP asset titles separately
+      const { data: assetsWithTitles, error: titleError } = await supabase
+        .from('ip_assets')
+        .select('id, title')
+        .in('id', assetIds);
+
+      if (titleError) throw titleError;
+
+      // Map alerts with IP asset titles
+      const formattedAlerts = alertsData?.map(alert => {
+        const asset = assetsWithTitles?.find(a => a.id === alert.ip_asset_id);
+        return {
+          ...alert,
+          ip_asset_title: asset?.title || 'Unknown Asset'
+        };
+      }) || [];
       
       setAlerts(formattedAlerts);
     } catch (error) {
