@@ -30,18 +30,35 @@ export const useMisinformationAlerts = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // First get alerts for user's IP assets
+      const { data: userAssets, error: assetsError } = await supabase
+        .from('ip_assets')
+        .select('id')
+        .eq('owner_id', user.id);
+
+      if (assetsError) throw assetsError;
+
+      const assetIds = userAssets?.map(asset => asset.id) || [];
+
+      if (assetIds.length === 0) {
+        setAlerts([]);
+        setLoading(false);
+        return;
+      }
+
+      // Then get alerts for those assets with IP asset info
+      const { data: alertsData, error: alertsError } = await supabase
         .from('misinformation_alerts')
         .select(`
           *,
-          ip_assets!inner(title, owner_id)
+          ip_assets(title)
         `)
-        .eq('ip_assets.owner_id', user.id)
+        .in('ip_asset_id', assetIds)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (alertsError) throw alertsError;
       
-      const formattedAlerts = data?.map(alert => ({
+      const formattedAlerts = alertsData?.map(alert => ({
         ...alert,
         ip_asset_title: alert.ip_assets?.title || 'Unknown Asset'
       })) || [];
