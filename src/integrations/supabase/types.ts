@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_analysis: {
+        Row: {
+          analysis_type: string
+          confidence_score: number | null
+          created_at: string | null
+          id: string
+          model_version: string | null
+          processing_time_ms: number | null
+          results: Json
+          subject_id: string
+          subject_type: string
+        }
+        Insert: {
+          analysis_type: string
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          model_version?: string | null
+          processing_time_ms?: number | null
+          results: Json
+          subject_id: string
+          subject_type: string
+        }
+        Update: {
+          analysis_type?: string
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          model_version?: string | null
+          processing_time_ms?: number | null
+          results?: Json
+          subject_id?: string
+          subject_type?: string
+        }
+        Relationships: []
+      }
       ai_models: {
         Row: {
           accuracy_score: number | null
@@ -2201,6 +2237,60 @@ export type Database = {
           },
         ]
       }
+      ip_assets: {
+        Row: {
+          blockchain_proof: string | null
+          created_at: string | null
+          description: string | null
+          expiry_date: string | null
+          file_hash: string | null
+          filing_date: string | null
+          id: string
+          ip_type: Database["public"]["Enums"]["ip_type"]
+          metadata: Json | null
+          organization_id: string | null
+          owner_id: string
+          registration_number: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          blockchain_proof?: string | null
+          created_at?: string | null
+          description?: string | null
+          expiry_date?: string | null
+          file_hash?: string | null
+          filing_date?: string | null
+          id?: string
+          ip_type: Database["public"]["Enums"]["ip_type"]
+          metadata?: Json | null
+          organization_id?: string | null
+          owner_id: string
+          registration_number?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          blockchain_proof?: string | null
+          created_at?: string | null
+          description?: string | null
+          expiry_date?: string | null
+          file_hash?: string | null
+          filing_date?: string | null
+          id?: string
+          ip_type?: Database["public"]["Enums"]["ip_type"]
+          metadata?: Json | null
+          organization_id?: string | null
+          owner_id?: string
+          registration_number?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       knowledge_nodes: {
         Row: {
           category: string | null
@@ -2333,6 +2423,123 @@ export type Database = {
         }
         Relationships: []
       }
+      legal_cases: {
+        Row: {
+          assigned_lawyer_id: string | null
+          case_number: string
+          case_status: Database["public"]["Enums"]["case_status"] | null
+          client_id: string
+          created_at: string | null
+          description: string | null
+          estimated_value: number | null
+          filing_date: string | null
+          id: string
+          ip_asset_id: string | null
+          metadata: Json | null
+          outcome: string | null
+          priority: Database["public"]["Enums"]["threat_level"] | null
+          resolution_date: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_lawyer_id?: string | null
+          case_number: string
+          case_status?: Database["public"]["Enums"]["case_status"] | null
+          client_id: string
+          created_at?: string | null
+          description?: string | null
+          estimated_value?: number | null
+          filing_date?: string | null
+          id?: string
+          ip_asset_id?: string | null
+          metadata?: Json | null
+          outcome?: string | null
+          priority?: Database["public"]["Enums"]["threat_level"] | null
+          resolution_date?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_lawyer_id?: string | null
+          case_number?: string
+          case_status?: Database["public"]["Enums"]["case_status"] | null
+          client_id?: string
+          created_at?: string | null
+          description?: string | null
+          estimated_value?: number | null
+          filing_date?: string | null
+          id?: string
+          ip_asset_id?: string | null
+          metadata?: Json | null
+          outcome?: string | null
+          priority?: Database["public"]["Enums"]["threat_level"] | null
+          resolution_date?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      legal_documents: {
+        Row: {
+          ai_generated: boolean | null
+          approved_by: string | null
+          case_id: string | null
+          content: string | null
+          created_at: string | null
+          creator_id: string
+          document_type: Database["public"]["Enums"]["document_type"]
+          file_url: string | null
+          id: string
+          ip_asset_id: string | null
+          lawyer_approved: boolean | null
+          metadata: Json | null
+          signature_required: boolean | null
+          signed_at: string | null
+          template_id: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          ai_generated?: boolean | null
+          approved_by?: string | null
+          case_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          creator_id: string
+          document_type: Database["public"]["Enums"]["document_type"]
+          file_url?: string | null
+          id?: string
+          ip_asset_id?: string | null
+          lawyer_approved?: boolean | null
+          metadata?: Json | null
+          signature_required?: boolean | null
+          signed_at?: string | null
+          template_id?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          ai_generated?: boolean | null
+          approved_by?: string | null
+          case_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          creator_id?: string
+          document_type?: Database["public"]["Enums"]["document_type"]
+          file_url?: string | null
+          id?: string
+          ip_asset_id?: string | null
+          lawyer_approved?: boolean | null
+          metadata?: Json | null
+          signature_required?: boolean | null
+          signed_at?: string | null
+          template_id?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       marketplace_items: {
         Row: {
           compatibility: string[] | null
@@ -2414,6 +2621,51 @@ export type Database = {
           read?: boolean | null
           sender_id?: string
           thread_id?: string
+        }
+        Relationships: []
+      }
+      misinformation_alerts: {
+        Row: {
+          ai_confidence: number | null
+          content_snippet: string | null
+          created_at: string | null
+          id: string
+          ip_asset_id: string
+          metadata: Json | null
+          resolved_at: string | null
+          response_action: string | null
+          source_url: string
+          status: string | null
+          threat_level: Database["public"]["Enums"]["threat_level"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          ai_confidence?: number | null
+          content_snippet?: string | null
+          created_at?: string | null
+          id?: string
+          ip_asset_id: string
+          metadata?: Json | null
+          resolved_at?: string | null
+          response_action?: string | null
+          source_url: string
+          status?: string | null
+          threat_level?: Database["public"]["Enums"]["threat_level"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          ai_confidence?: number | null
+          content_snippet?: string | null
+          created_at?: string | null
+          id?: string
+          ip_asset_id?: string
+          metadata?: Json | null
+          resolved_at?: string | null
+          response_action?: string | null
+          source_url?: string
+          status?: string | null
+          threat_level?: Database["public"]["Enums"]["threat_level"] | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -4013,6 +4265,42 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          features: Json
+          id: string
+          limits: Json
+          name: string
+          price_monthly: number | null
+          price_yearly: number | null
+          tier: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          features: Json
+          id?: string
+          limits: Json
+          name: string
+          price_monthly?: number | null
+          price_yearly?: number | null
+          tier: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          features?: Json
+          id?: string
+          limits?: Json
+          name?: string
+          price_monthly?: number | null
+          price_yearly?: number | null
+          tier?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -4892,6 +5180,51 @@ export type Database = {
           region?: string
           theme?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          cancel_at: string | null
+          canceled_at: string | null
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan_id: string
+          status: string | null
+          stripe_subscription_id: string | null
+          trial_end: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cancel_at?: string | null
+          canceled_at?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_id: string
+          status?: string | null
+          stripe_subscription_id?: string | null
+          trial_end?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cancel_at?: string | null
+          canceled_at?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_id?: string
+          status?: string | null
+          stripe_subscription_id?: string | null
+          trial_end?: string | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -6873,11 +7206,13 @@ export type Database = {
       application_status: "pending" | "approved" | "rejected"
       assessment_status: "pending" | "in_progress" | "completed" | "overdue"
       carbon_data_source: "manual" | "iot" | "erp" | "smart_meter"
+      case_status: "open" | "in_progress" | "resolved" | "closed"
       compliance_status:
         | "compliant"
         | "non_compliant"
         | "under_review"
         | "remediation_required"
+      document_type: "nda" | "cease_desist" | "dmca" | "license" | "contract"
       emission_scope: "scope1" | "scope2" | "scope3"
       engagement_status: "planned" | "completed" | "requires_follow_up"
       esg_category: "environmental" | "social" | "governance"
@@ -6913,6 +7248,7 @@ export type Database = {
         | "collaborative_whiteboard"
         | "immersive_vr"
         | "predictive_interface"
+      ip_type: "patent" | "trademark" | "copyright" | "trade_secret"
       metric_type: "wildlife" | "supply_chain" | "sensor" | "collaboration"
       partner_status: "active" | "inactive" | "pending"
       partnership_type: "technology" | "consulting" | "research" | "other"
@@ -6945,6 +7281,7 @@ export type Database = {
         | "failed"
       supplier_status: "pending" | "approved" | "at_risk" | "suspended"
       task_status: "todo" | "in_progress" | "done"
+      threat_level: "low" | "medium" | "high" | "critical"
       user_archetype:
         | "visionary_ceo"
         | "technical_cto"
@@ -7105,12 +7442,14 @@ export const Constants = {
       application_status: ["pending", "approved", "rejected"],
       assessment_status: ["pending", "in_progress", "completed", "overdue"],
       carbon_data_source: ["manual", "iot", "erp", "smart_meter"],
+      case_status: ["open", "in_progress", "resolved", "closed"],
       compliance_status: [
         "compliant",
         "non_compliant",
         "under_review",
         "remediation_required",
       ],
+      document_type: ["nda", "cease_desist", "dmca", "license", "contract"],
       emission_scope: ["scope1", "scope2", "scope3"],
       engagement_status: ["planned", "completed", "requires_follow_up"],
       esg_category: ["environmental", "social", "governance"],
@@ -7149,6 +7488,7 @@ export const Constants = {
         "immersive_vr",
         "predictive_interface",
       ],
+      ip_type: ["patent", "trademark", "copyright", "trade_secret"],
       metric_type: ["wildlife", "supply_chain", "sensor", "collaboration"],
       partner_status: ["active", "inactive", "pending"],
       partnership_type: ["technology", "consulting", "research", "other"],
@@ -7184,6 +7524,7 @@ export const Constants = {
       ],
       supplier_status: ["pending", "approved", "at_risk", "suspended"],
       task_status: ["todo", "in_progress", "done"],
+      threat_level: ["low", "medium", "high", "critical"],
       user_archetype: [
         "visionary_ceo",
         "technical_cto",
