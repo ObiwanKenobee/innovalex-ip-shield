@@ -2,42 +2,51 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Scale, FileText, AlertTriangle, TrendingUp, Users } from 'lucide-react';
+import { useIPAssets } from '@/hooks/useIPAssets';
+import { useLegalCases } from '@/hooks/useLegalCases';
+import { useDocuments } from '@/hooks/useDocuments';
+import { useMisinformationAlerts } from '@/hooks/useMisinformationAlerts';
 
 export const DashboardOverview = () => {
+  const { assets } = useIPAssets();
+  const { cases } = useLegalCases();
+  const { documents } = useDocuments();
+  const { alerts } = useMisinformationAlerts();
+
   const stats = [
     {
       title: 'IP Assets Protected',
-      value: '24',
+      value: assets.length.toString(),
       description: 'Active intellectual property assets',
       icon: Shield,
-      trend: '+12%',
+      trend: `${assets.filter(a => a.status === 'active').length} active`,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
     },
     {
       title: 'Active Legal Cases',
-      value: '3',
+      value: cases.filter(c => c.case_status === 'in_progress' || c.case_status === 'open').length.toString(),
       description: 'Cases in progress',
       icon: Scale,
-      trend: '+2 this month',
+      trend: `${cases.filter(c => c.case_status === 'open').length} new`,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
     },
     {
       title: 'Documents Generated',
-      value: '156',
+      value: documents.length.toString(),
       description: 'AI-generated legal documents',
       icon: FileText,
-      trend: '+34 this week',
+      trend: `${documents.filter(d => d.ai_generated).length} AI-created`,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
     },
     {
       title: 'Threats Detected',
-      value: '7',
-      description: 'Misinformation alerts resolved',
+      value: alerts.length.toString(),
+      description: 'Misinformation alerts',
       icon: AlertTriangle,
-      trend: '-2 from last week',
+      trend: `${alerts.filter(a => a.status === 'resolved').length} resolved`,
       color: 'text-red-600',
       bgColor: 'bg-red-100',
     },
@@ -45,27 +54,27 @@ export const DashboardOverview = () => {
 
   const recentActivity = [
     {
-      action: 'New patent application filed',
-      details: 'AI-powered legal document analysis system',
-      time: '2 hours ago',
+      action: 'New IP asset registered',
+      details: assets.length > 0 ? assets[0]?.title || 'Recent IP asset' : 'AI-powered legal document analysis system',
+      time: assets.length > 0 ? new Date(assets[0]?.created_at).toLocaleTimeString() : '2 hours ago',
       type: 'success',
     },
     {
       action: 'Misinformation threat detected',
-      details: 'Unauthorized use of trademark detected on social media',
-      time: '4 hours ago',
+      details: alerts.length > 0 ? `${alerts[0]?.threat_level} threat detected` : 'Unauthorized use of trademark detected on social media',
+      time: alerts.length > 0 ? new Date(alerts[0]?.created_at).toLocaleTimeString() : '4 hours ago',
       type: 'warning',
     },
     {
       action: 'Legal case updated',
-      details: 'Copyright infringement case - preliminary response filed',
-      time: '1 day ago',
+      details: cases.length > 0 ? cases[0]?.title || 'Recent case update' : 'Copyright infringement case - preliminary response filed',
+      time: cases.length > 0 ? new Date(cases[0]?.created_at).toLocaleTimeString() : '1 day ago',
       type: 'info',
     },
     {
-      action: 'NDA generated and sent',
-      details: 'Confidentiality agreement for partnership discussion',
-      time: '2 days ago',
+      action: 'Document generated',
+      details: documents.length > 0 ? documents[0]?.title || 'Recent document' : 'Confidentiality agreement for partnership discussion',
+      time: documents.length > 0 ? new Date(documents[0]?.created_at).toLocaleTimeString() : '2 days ago',
       type: 'success',
     },
   ];
@@ -178,7 +187,7 @@ export const DashboardOverview = () => {
                 <span className="text-sm text-gray-600">Document Pipeline</span>
                 <span className="flex items-center text-sm text-yellow-600">
                   <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
-                  Processing 3 docs
+                  Processing {documents.filter(d => !d.lawyer_approved).length} docs
                 </span>
               </div>
             </div>

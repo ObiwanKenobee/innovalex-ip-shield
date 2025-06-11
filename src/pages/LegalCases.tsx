@@ -1,37 +1,17 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { CreateLegalCaseForm } from '@/components/legal-cases/CreateLegalCaseForm';
+import { useLegalCases } from '@/hooks/useLegalCases';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Scale, Calendar, DollarSign, Plus, AlertTriangle } from 'lucide-react';
+import { Scale, Calendar, DollarSign, Plus, AlertTriangle, Loader2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 const LegalCases = () => {
-  // Mock data - replace with real data from Supabase
-  const cases = [
-    {
-      id: '1',
-      case_number: 'LC-2024-001',
-      title: 'Patent Infringement Case - AI Technology',
-      description: 'Unauthorized use of our AI patent by competitor XYZ Corp',
-      case_status: 'in_progress',
-      priority: 'high',
-      estimated_value: 500000,
-      filing_date: '2024-01-15',
-      client_name: 'InnovaTech Solutions'
-    },
-    {
-      id: '2',
-      case_number: 'LC-2024-002',
-      title: 'Trademark Dispute - Brand Logo',
-      description: 'Competitor using similar trademark causing confusion',
-      case_status: 'open',
-      priority: 'medium',
-      estimated_value: 150000,
-      filing_date: '2024-02-01',
-      client_name: 'Creative Brands Inc'
-    }
-  ];
+  const { cases, loading } = useLegalCases();
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -74,71 +54,32 @@ const LegalCases = () => {
               Manage active legal proceedings and case status
             </p>
           </div>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Case
-          </Button>
+          <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                New Case
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl">
+              <DialogHeader>
+                <DialogTitle>Create New Legal Case</DialogTitle>
+                <DialogDescription>
+                  Register a new legal case in your system
+                </DialogDescription>
+              </DialogHeader>
+              <CreateLegalCaseForm onSuccess={() => setShowCreateForm(false)} />
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Cases Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {cases.map((case_item) => (
-            <Card key={case_item.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Scale className="h-5 w-5 text-blue-600" />
-                    <CardTitle className="text-lg">{case_item.case_number}</CardTitle>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Badge className={getStatusColor(case_item.case_status)}>
-                      {case_item.case_status.replace('_', ' ')}
-                    </Badge>
-                    <Badge className={getPriorityColor(case_item.priority)}>
-                      {case_item.priority}
-                    </Badge>
-                  </div>
-                </div>
-                <CardTitle className="text-xl">{case_item.title}</CardTitle>
-                <CardDescription>
-                  {case_item.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    <span>Filed: {new Date(case_item.filing_date).toLocaleDateString()}</span>
-                  </div>
-                  
-                  <div className="flex items-center text-sm text-gray-600">
-                    <DollarSign className="h-4 w-4 mr-2" />
-                    <span>Est. Value: ${case_item.estimated_value.toLocaleString()}</span>
-                  </div>
-                  
-                  <div className="flex items-center text-sm text-gray-600">
-                    <AlertTriangle className="h-4 w-4 mr-2" />
-                    <span>Client: {case_item.client_name}</span>
-                  </div>
-                  
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <Button variant="outline" size="sm">
-                        View Details
-                      </Button>
-                      <Button size="sm">
-                        Update Status
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {cases.length === 0 && (
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            <span className="ml-2 text-gray-600">Loading legal cases...</span>
+          </div>
+        ) : cases.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Scale className="h-12 w-12 text-gray-400 mb-4" />
@@ -146,12 +87,65 @@ const LegalCases = () => {
               <p className="text-gray-600 text-center max-w-md mb-4">
                 You don't have any active legal cases at the moment.
               </p>
-              <Button>
+              <Button onClick={() => setShowCreateForm(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Create First Case
               </Button>
             </CardContent>
           </Card>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {cases.map((case_item) => (
+              <Card key={case_item.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Scale className="h-5 w-5 text-blue-600" />
+                      <CardTitle className="text-lg">{case_item.case_number}</CardTitle>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Badge className={getStatusColor(case_item.case_status)}>
+                        {case_item.case_status.replace('_', ' ')}
+                      </Badge>
+                      <Badge className={getPriorityColor(case_item.priority)}>
+                        {case_item.priority}
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardTitle className="text-xl">{case_item.title}</CardTitle>
+                  <CardDescription>
+                    {case_item.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      <span>Filed: {new Date(case_item.filing_date).toLocaleDateString()}</span>
+                    </div>
+                    
+                    {case_item.estimated_value && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <DollarSign className="h-4 w-4 mr-2" />
+                        <span>Est. Value: ${case_item.estimated_value.toLocaleString()}</span>
+                      </div>
+                    )}
+                    
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="flex justify-between items-center">
+                        <Button variant="outline" size="sm">
+                          View Details
+                        </Button>
+                        <Button size="sm">
+                          Update Status
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
       </div>
     </DashboardLayout>

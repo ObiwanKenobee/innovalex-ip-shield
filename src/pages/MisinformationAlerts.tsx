@@ -1,47 +1,14 @@
 
 import React from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useMisinformationAlerts } from '@/hooks/useMisinformationAlerts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Calendar, ExternalLink, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { AlertTriangle, Calendar, ExternalLink, CheckCircle, XCircle, Clock, Loader2 } from 'lucide-react';
 
 const MisinformationAlerts = () => {
-  // Mock data - replace with real data from Supabase
-  const alerts = [
-    {
-      id: '1',
-      source_url: 'https://social-media-platform.com/post/123',
-      content_snippet: 'Claiming our patented AI technology as their own invention...',
-      threat_level: 'high',
-      ai_confidence: 0.92,
-      status: 'pending',
-      created_at: '2024-01-20T10:30:00Z',
-      ip_asset_title: 'AI-Powered Legal Analysis System'
-    },
-    {
-      id: '2',
-      source_url: 'https://competitor-blog.com/our-innovation',
-      content_snippet: 'False claims about trademark ownership and priority...',
-      threat_level: 'medium',
-      ai_confidence: 0.78,
-      status: 'resolved',
-      created_at: '2024-01-18T14:15:00Z',
-      resolved_at: '2024-01-19T09:00:00Z',
-      response_action: 'Cease and desist letter sent',
-      ip_asset_title: 'InnovaLex Trademark'
-    },
-    {
-      id: '3',
-      source_url: 'https://news-site.com/tech-article',
-      content_snippet: 'Unauthorized use of copyrighted materials in article...',
-      threat_level: 'low',
-      ai_confidence: 0.65,
-      status: 'investigating',
-      created_at: '2024-01-19T16:45:00Z',
-      ip_asset_title: 'Marketing Materials Copyright'
-    }
-  ];
+  const { alerts, loading, resolveAlert } = useMisinformationAlerts();
 
   const getThreatLevelColor = (level: string) => {
     switch (level) {
@@ -81,6 +48,14 @@ const MisinformationAlerts = () => {
         return 'bg-blue-100 text-blue-800';
       default:
         return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleResolveAlert = async (alertId: string) => {
+    try {
+      await resolveAlert(alertId, 'Manual resolution - threat addressed');
+    } catch (error) {
+      console.error('Error resolving alert:', error);
     }
   };
 
@@ -149,7 +124,7 @@ const MisinformationAlerts = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Avg Confidence</p>
                   <p className="text-2xl font-bold text-blue-600">
-                    {Math.round(alerts.reduce((sum, a) => sum + a.ai_confidence, 0) / alerts.length * 100)}%
+                    {alerts.length > 0 ? Math.round(alerts.reduce((sum, a) => sum + (a.ai_confidence || 0), 0) / alerts.length * 100) : 0}%
                   </p>
                 </div>
                 <AlertTriangle className="h-8 w-8 text-blue-600" />
@@ -159,96 +134,12 @@ const MisinformationAlerts = () => {
         </div>
 
         {/* Alerts List */}
-        <div className="space-y-4">
-          {alerts.map((alert) => (
-            <Card key={alert.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    {getStatusIcon(alert.status)}
-                    <div>
-                      <CardTitle className="text-lg">{alert.ip_asset_title}</CardTitle>
-                      <CardDescription>
-                        Detected on: {new URL(alert.source_url).hostname}
-                      </CardDescription>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge className={getThreatLevelColor(alert.threat_level)}>
-                      {alert.threat_level} threat
-                    </Badge>
-                    <Badge className={getStatusColor(alert.status)}>
-                      {alert.status}
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-sm text-gray-700 italic">
-                      "{alert.content_snippet}"
-                    </p>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <div className="flex items-center text-gray-600">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      <span>Detected: {new Date(alert.created_at).toLocaleDateString()}</span>
-                    </div>
-                    
-                    <div className="flex items-center text-gray-600">
-                      <AlertTriangle className="h-4 w-4 mr-2" />
-                      <span>AI Confidence: {Math.round(alert.ai_confidence * 100)}%</span>
-                    </div>
-                    
-                    {alert.resolved_at && (
-                      <div className="flex items-center text-green-600">
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        <span>Resolved: {new Date(alert.resolved_at).toLocaleDateString()}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {alert.response_action && (
-                    <div className="bg-green-50 p-3 rounded-lg">
-                      <p className="text-sm text-green-800">
-                        <strong>Action Taken:</strong> {alert.response_action}
-                      </p>
-                    </div>
-                  )}
-                  
-                  <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-                    <Button variant="outline" size="sm">
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      View Source
-                    </Button>
-                    <div className="flex space-x-2">
-                      {alert.status === 'pending' && (
-                        <>
-                          <Button variant="outline" size="sm">
-                            Investigate
-                          </Button>
-                          <Button size="sm">
-                            Take Action
-                          </Button>
-                        </>
-                      )}
-                      {alert.status === 'investigating' && (
-                        <Button size="sm">
-                          Resolve
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {alerts.length === 0 && (
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            <span className="ml-2 text-gray-600">Loading alerts...</span>
+          </div>
+        ) : alerts.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <AlertTriangle className="h-12 w-12 text-gray-400 mb-4" />
@@ -262,6 +153,98 @@ const MisinformationAlerts = () => {
               </Button>
             </CardContent>
           </Card>
+        ) : (
+          <div className="space-y-4">
+            {alerts.map((alert) => (
+              <Card key={alert.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      {getStatusIcon(alert.status)}
+                      <div>
+                        <CardTitle className="text-lg">{alert.ip_asset_title}</CardTitle>
+                        <CardDescription>
+                          Detected on: {new URL(alert.source_url).hostname}
+                        </CardDescription>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Badge className={getThreatLevelColor(alert.threat_level)}>
+                        {alert.threat_level} threat
+                      </Badge>
+                      <Badge className={getStatusColor(alert.status)}>
+                        {alert.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {alert.content_snippet && (
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <p className="text-sm text-gray-700 italic">
+                          "{alert.content_snippet}"
+                        </p>
+                      </div>
+                    )}
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div className="flex items-center text-gray-600">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        <span>Detected: {new Date(alert.created_at).toLocaleDateString()}</span>
+                      </div>
+                      
+                      {alert.ai_confidence && (
+                        <div className="flex items-center text-gray-600">
+                          <AlertTriangle className="h-4 w-4 mr-2" />
+                          <span>AI Confidence: {Math.round(alert.ai_confidence * 100)}%</span>
+                        </div>
+                      )}
+                      
+                      {alert.resolved_at && (
+                        <div className="flex items-center text-green-600">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          <span>Resolved: {new Date(alert.resolved_at).toLocaleDateString()}</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {alert.response_action && (
+                      <div className="bg-green-50 p-3 rounded-lg">
+                        <p className="text-sm text-green-800">
+                          <strong>Action Taken:</strong> {alert.response_action}
+                        </p>
+                      </div>
+                    )}
+                    
+                    <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                      <Button variant="outline" size="sm">
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        View Source
+                      </Button>
+                      <div className="flex space-x-2">
+                        {alert.status === 'pending' && (
+                          <>
+                            <Button variant="outline" size="sm">
+                              Investigate
+                            </Button>
+                            <Button size="sm" onClick={() => handleResolveAlert(alert.id)}>
+                              Resolve
+                            </Button>
+                          </>
+                        )}
+                        {alert.status === 'investigating' && (
+                          <Button size="sm" onClick={() => handleResolveAlert(alert.id)}>
+                            Mark Resolved
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
       </div>
     </DashboardLayout>

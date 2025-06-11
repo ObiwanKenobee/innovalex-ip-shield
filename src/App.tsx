@@ -11,6 +11,9 @@ import IPAssets from "./pages/IPAssets";
 import LegalCases from "./pages/LegalCases";
 import Documents from "./pages/Documents";
 import MisinformationAlerts from "./pages/MisinformationAlerts";
+import Analytics from "./pages/Analytics";
+import Team from "./pages/Team";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +32,9 @@ const App = () => (
             <Route path="/legal-cases" element={<LegalCases />} />
             <Route path="/documents" element={<Documents />} />
             <Route path="/alerts" element={<MisinformationAlerts />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/settings" element={<Settings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
