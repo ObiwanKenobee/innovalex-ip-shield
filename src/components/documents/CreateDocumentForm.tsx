@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -44,7 +43,18 @@ export const CreateDocumentForm: React.FC<CreateDocumentFormProps> = ({ onSucces
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await createDocument(values);
+      // Ensure required fields are present
+      const documentData = {
+        title: values.title,
+        document_type: values.document_type,
+        content: values.content,
+        case_id: values.case_id,
+        ip_asset_id: values.ip_asset_id,
+        signature_required: values.signature_required,
+        ai_generated: values.ai_generated,
+      };
+      
+      await createDocument(documentData);
       form.reset();
       onSuccess?.();
     } catch (error) {
